@@ -1,0 +1,40 @@
+services:
+  dataset:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mlops-week01-baseline:0.2.0
+    working_dir: /app
+    command: ["python", "make_dataset.py"]
+    volumes:
+      - ./:/app
+
+  train:
+    image: mlops-week01-baseline:0.2.0
+    working_dir: /app
+    command: ["python", "train.py"]
+    depends_on:
+      dataset:
+        condition: service_completed_successfully
+    volumes:
+      - ./:/app
+
+  sample:
+    image: mlops-week01-baseline:0.2.0
+    working_dir: /app
+    command: ["python", "sample_input.py"]
+    depends_on:
+      train:
+        condition: service_completed_successfully
+    volumes:
+      - ./:/app
+
+  predict:
+    image: mlops-week01-baseline:0.2.0
+    working_dir: /app
+    command: ["python", "predict.py", "--input", "data/sample_input.csv", "--output", "models/predictions.csv"]
+    depends_on:
+      sample:
+        condition: service_completed_successfully
+    volumes:
+      - ./:/app
