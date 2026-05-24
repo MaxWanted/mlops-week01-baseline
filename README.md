@@ -156,7 +156,10 @@ Expected result:
 - `data/dataset.csv` exists.
 - `models/model.joblib` exists.
 - `models/metrics.json` exists and contains `accuracy`, `f1`, `roc_auc`.
-- `models/predictions.csv` exists with `prediction` and `probability` columns.
+- `models/predictions.csv` exists with:
+  - `prediction` (`0` or `1`)
+  - `prediction_label` (`malignant` or `benign`)
+  - `probability` (probability of class `1`, `benign`)
 
 How to validate quickly:
 

@@ -5,6 +5,8 @@ from pathlib import Path
 import joblib
 import pandas as pd
 
+LABEL_MAP = {0: "malignant", 1: "benign"}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -42,6 +44,7 @@ def main() -> None:
 
     out_df = features.copy()
     out_df["prediction"] = pred
+    out_df["prediction_label"] = [LABEL_MAP[int(v)] for v in pred]
     out_df["probability"] = proba
 
     output_path = Path(args.output)
@@ -57,4 +60,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
