@@ -133,6 +133,60 @@ Linux VM note:
 - For Linux VM volumes, use project path directly (example: `/home/user/mlops-week01-baseline:/app`).
 - If port `5000`, `9000`, or `9001` already busy on VM, change host ports in `docker-compose.mlflow.yml`.
 
+## VirtualBox port forwarding (open UI on host)
+
+If services run inside Linux VM, configure port forwarding so host browser can open MLflow/MinIO UI.
+
+Ports in this project:
+
+- `5000` -> MLflow UI
+- `9000` -> MinIO API
+- `9001` -> MinIO Console
+
+### Option A: VirtualBox UI
+
+1. Power off VM.
+2. VirtualBox -> VM -> `Settings` -> `Network`.
+3. Adapter 1 mode: `NAT`.
+4. Open `Advanced` -> `Port Forwarding`.
+5. Add rules:
+   - Name: `mlflow`, Protocol: `TCP`, Host Port: `5000`, Guest Port: `5000`
+   - Name: `minio-api`, Protocol: `TCP`, Host Port: `9000`, Guest Port: `9000`
+   - Name: `minio-console`, Protocol: `TCP`, Host Port: `9001`, Guest Port: `9001`
+6. Start VM.
+
+### Option B: `VBoxManage` CLI
+
+Run on host (PowerShell/cmd), replace `YOUR_VM_NAME`:
+
+```bash
+VBoxManage modifyvm "YOUR_VM_NAME" --natpf1 "mlflow,tcp,,5000,,5000"
+VBoxManage modifyvm "YOUR_VM_NAME" --natpf1 "minio-api,tcp,,9000,,9000"
+VBoxManage modifyvm "YOUR_VM_NAME" --natpf1 "minio-console,tcp,,9001,,9001"
+```
+
+Remove rules if needed:
+
+```bash
+VBoxManage modifyvm "YOUR_VM_NAME" --natpf1 delete "mlflow"
+VBoxManage modifyvm "YOUR_VM_NAME" --natpf1 delete "minio-api"
+VBoxManage modifyvm "YOUR_VM_NAME" --natpf1 delete "minio-console"
+```
+
+### Verify from host
+
+1. In VM: `make mlflow-up`
+2. On host browser open:
+   - `http://localhost:5000` (MLflow)
+   - `http://localhost:9001` (MinIO Console)
+
+If page not opening:
+
+1. Check containers in VM: `docker ps`
+2. Check compose ports in VM: `docker compose -f docker-compose.mlflow.yml ps`
+3. Make sure VirtualBox adapter is `NAT` and rules are on `Adapter 1`
+4. Ensure host ports are not already occupied by another process
+
 ## End-to-end runbook (Week 01 -> Week 03)
 
 This section is the practical path we already built.
