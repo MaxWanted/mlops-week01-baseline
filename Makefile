@@ -2,13 +2,16 @@ PYTHON := python
 VENV := .venv
 IMAGE := mlops-week01-baseline:0.2.0
 
-.PHONY: venv install dataset train sample predict all clean docker-build docker-all docker-train docker-predict compose-up compose-down
+.PHONY: venv install install-mlflow dataset train sample predict train-mlflow all clean docker-build docker-all docker-train docker-predict compose-up compose-down mlflow-up mlflow-down mlflow-train
 
 venv:
 	$(PYTHON) -m venv $(VENV)
 
 install:
 	$(VENV)/Scripts/pip install -r requirements.txt
+
+install-mlflow:
+	$(VENV)/Scripts/pip install -r requirements-mlflow.txt
 
 dataset:
 	$(VENV)/Scripts/python make_dataset.py
@@ -21,6 +24,9 @@ sample:
 
 predict:
 	$(VENV)/Scripts/python predict.py --input data/sample_input.csv --output models/predictions.csv
+
+train-mlflow:
+	$(VENV)/Scripts/python train_mlflow.py
 
 all: dataset train sample predict
 
@@ -47,3 +53,12 @@ compose-up:
 
 compose-down:
 	docker compose down --remove-orphans
+
+mlflow-up:
+	docker compose -f docker-compose.mlflow.yml --env-file .env.mlflow.example up -d
+
+mlflow-down:
+	docker compose -f docker-compose.mlflow.yml --env-file .env.mlflow.example down -v --remove-orphans
+
+mlflow-train:
+	$(VENV)/Scripts/python train_mlflow.py

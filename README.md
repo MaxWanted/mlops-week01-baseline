@@ -3,6 +3,7 @@
 Week 01 + Week 02 MLOps foundations:
 - Week 01: train/evaluate/predict baseline.
 - Week 02: Docker and Docker Compose reproducibility.
+- Week 03: MLflow + Postgres + MinIO experiment tracking stack.
 
 ## Goal
 
@@ -85,6 +86,53 @@ Or via `make`:
 make compose-up
 ```
 
+## Week 03: MLflow Tracking Stack
+
+Start stack (MLflow + Postgres + MinIO):
+
+```bash
+docker compose -f docker-compose.mlflow.yml --env-file .env.mlflow.example up -d
+```
+
+Install MLflow client dependencies:
+
+```bash
+source .venv/Scripts/activate
+pip install -r requirements-mlflow.txt
+```
+
+Run training with MLflow logging:
+
+```bash
+python train_mlflow.py
+```
+
+Useful URLs:
+
+- MLflow UI: `http://localhost:5000`
+- MinIO API: `http://localhost:9000`
+- MinIO Console: `http://localhost:9001`
+
+Stop stack:
+
+```bash
+docker compose -f docker-compose.mlflow.yml --env-file .env.mlflow.example down -v --remove-orphans
+```
+
+`Makefile` shortcuts:
+
+```bash
+make mlflow-up
+make install-mlflow
+make mlflow-train
+make mlflow-down
+```
+
+Linux VM note:
+
+- For Linux VM volumes, use project path directly (example: `/home/user/mlops-week01-baseline:/app`).
+- If port `5000`, `9000`, or `9001` already busy on VM, change host ports in `docker-compose.mlflow.yml`.
+
 ## Expected output
 
 After run:
@@ -103,3 +151,4 @@ After run:
 
 - `v0.1-week01-baseline` - pure Python baseline.
 - `v0.2-week02-docker` - Dockerfile + docker run + docker compose flow.
+- `v0.3-week03-mlflow` - MLflow stack and experiment logging script.
